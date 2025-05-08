@@ -18,17 +18,19 @@ public class Transacao {
 	private Usuario remetente;
 	@ManyToOne
 	private Usuario destinatario;
+	private Double valor;
 	private LocalDateTime dataHora;
 	private Boolean sucesso;
 
 	public Transacao() {
 	}
 
-	public Transacao(Usuario remetente, Usuario destinatario, Boolean sucesso) {
+	public Transacao(Usuario remetente, Usuario destinatario, Boolean sucesso, Double valor) {
 		this.remetente = remetente;
 		this.destinatario = destinatario;
 		this.dataHora = LocalDateTime.now();
 		this.sucesso = sucesso;
+		this.valor = valor;
 	}
 
 	public Usuario getRemetente() {
@@ -63,4 +65,21 @@ public class Transacao {
 		this.sucesso = sucesso;
 	}
 
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public Double getValor() {
+		return valor;
+	}
+
+	public void setValor(Double valor) {
+		this.valor = valor;
+	}
+
+	
 }
