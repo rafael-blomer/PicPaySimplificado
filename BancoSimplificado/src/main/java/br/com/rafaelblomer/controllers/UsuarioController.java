@@ -17,9 +17,9 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import br.com.rafaelblomer.business.UsuariosService;
 import br.com.rafaelblomer.business.dtos.AlteracaoSenhaDTO;
-import br.com.rafaelblomer.infrastructure.entities.Usuario;
-import br.com.rafaelblomer.infrastructure.entities.UsuarioComum;
-import br.com.rafaelblomer.infrastructure.entities.UsuarioLojista;
+import br.com.rafaelblomer.business.dtos.DepositoDTO;
+import br.com.rafaelblomer.business.dtos.UsuarioRequestDTO;
+import br.com.rafaelblomer.business.dtos.UsuarioResponseDTO;
 
 @RestController
 @RequestMapping("/usuarios")
@@ -29,27 +29,27 @@ public class UsuarioController {
 	private UsuariosService service;
 
 	@GetMapping
-	public ResponseEntity<List<Usuario>> buscarTodosUsuarios() {
+	public ResponseEntity<List<UsuarioResponseDTO>> buscarTodosUsuarios() {
 		return ResponseEntity.ok().body(service.buscarTodosUsuarios());
 	}
 
 	@GetMapping("/one")
-	public ResponseEntity<Usuario> buscarUmUsuario(@RequestParam Long id) {
-		return ResponseEntity.ok().body(service.buscarUmUsuario(id));
+	public ResponseEntity<UsuarioResponseDTO> buscarUmUsuario(@RequestParam Long id) {
+		return ResponseEntity.ok().body(service.buscarUmUsuarioResponseDTO(id));
 	}
 
 	@PostMapping("/comum")
-	public ResponseEntity<Usuario> criarNovoUsuario(@RequestBody UsuarioComum comum) {
-		UsuarioComum usuarioCriado = service.novoComum(comum);
-		URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id})").buildAndExpand(usuarioCriado.getId())
+	public ResponseEntity<UsuarioResponseDTO> criarNovoUsuarioComum(@RequestBody UsuarioRequestDTO dtoComum) {
+		UsuarioResponseDTO usuarioCriado = service.novoComum(dtoComum);
+		URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id})").buildAndExpand(usuarioCriado.id())
 				.toUri();
 		return ResponseEntity.created(uri).body(usuarioCriado);
 	}
 	
 	@PostMapping("/lojista")
-	public ResponseEntity<Usuario> criarNovoUsuario(@RequestBody UsuarioLojista lojista) {
-		UsuarioLojista usuarioCriado = service.novoLojista(lojista);
-		URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id})").buildAndExpand(usuarioCriado.getId())
+	public ResponseEntity<UsuarioResponseDTO> criarNovoUsuarioLojista(@RequestBody UsuarioRequestDTO dtoLojista) {
+		UsuarioResponseDTO usuarioCriado = service.novoLojista(dtoLojista);
+		URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id})").buildAndExpand(usuarioCriado.id())
 				.toUri();
 		return ResponseEntity.created(uri).body(usuarioCriado);
 	}
@@ -66,10 +66,9 @@ public class UsuarioController {
 		return ResponseEntity.noContent().build();
 	}
 
-	//TODO: criar dto para não receber os parametors via utl
 	@PatchMapping("/depositar")
-	public ResponseEntity<Usuario> alterarSenha(@RequestParam Long id, @RequestParam Double quantia) {
-		return ResponseEntity.ok().body(service.depositarDinheiro(id, quantia));
+	public ResponseEntity<String> realizarDeposito(@RequestBody DepositoDTO dto) {
+		return ResponseEntity.ok().body(service.depositarDinheiro(dto));
 	}
 
 }
