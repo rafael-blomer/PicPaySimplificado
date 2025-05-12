@@ -10,6 +10,7 @@ import br.com.rafaelblomer.business.exceptions.DadoUnicoException;
 import br.com.rafaelblomer.business.exceptions.DinheiroEmContaException;
 import br.com.rafaelblomer.business.exceptions.SaldoInsuficienteException;
 import br.com.rafaelblomer.business.exceptions.TransferenciaDeLojistaException;
+import br.com.rafaelblomer.business.exceptions.TransferenciaNaoAutorizadaException;
 import br.com.rafaelblomer.business.exceptions.UsuarioNaoEncontradoException;
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -57,4 +58,12 @@ public class ResourceExceptionHandler {
 		StandardError err = new StandardError(System.currentTimeMillis(), status.value(), "Esse dado já existe em nosso sitema.", e.getMessage(), request.getRequestURI());
 		return ResponseEntity.status(status).body(err);
 	}
+	
+	@ExceptionHandler(TransferenciaNaoAutorizadaException.class)
+	public ResponseEntity<StandardError> dadoUnico(TransferenciaNaoAutorizadaException e, HttpServletRequest request) {
+		HttpStatus status = HttpStatus.FORBIDDEN;
+		StandardError err = new StandardError(System.currentTimeMillis(), status.value(), "Não foi possível concluir a transferência.", e.getMessage(), request.getRequestURI());
+		return ResponseEntity.status(status).body(err);
+	}
+	
 }
