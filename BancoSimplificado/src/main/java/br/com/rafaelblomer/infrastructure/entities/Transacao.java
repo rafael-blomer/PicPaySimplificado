@@ -37,6 +37,7 @@ public class Transacao {
 	 * ALTER TABLE transacao ADD CONSTRAINT fk_usuario_destinatario FOREIGN KEY
 	 * (usuario_destinatario) REFERENCES usuario(id) ON DELETE SET NULL;
 	 */
+	 
 	
 	public Transacao() {
 	}

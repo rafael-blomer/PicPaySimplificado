@@ -1,13 +1,17 @@
 package br.com.rafaelblomer.business;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import br.com.rafaelblomer.business.converter.Converter;
 import br.com.rafaelblomer.business.dtos.TransacaoDTO;
 import br.com.rafaelblomer.business.exceptions.SaldoInsuficienteException;
 import br.com.rafaelblomer.business.exceptions.TransferenciaDeLojistaException;
+import br.com.rafaelblomer.business.exceptions.TransferenciaNaoAutorizadaException;
 import br.com.rafaelblomer.business.exceptions.UsuarioNaoEncontradoException;
+import br.com.rafaelblomer.infrastructure.clients.AutorizadorClient;
+import br.com.rafaelblomer.infrastructure.clients.response.AutorizacaoResponse;
 import br.com.rafaelblomer.infrastructure.entities.Transacao;
 import br.com.rafaelblomer.infrastructure.entities.Usuario;
 import br.com.rafaelblomer.infrastructure.entities.UsuarioLojista;
@@ -16,6 +20,9 @@ import jakarta.transaction.Transactional;
 
 @Service
 public class TransacaoService {
+	
+    @Autowired
+    private AutorizadorClient autorizadorClient;
 
 	@Autowired
 	private TransacaoRepository repository;
@@ -26,16 +33,23 @@ public class TransacaoService {
 	@Autowired
 	private Converter converter;
 	
+	@Autowired
+	private NotificacaoService notificacaoService;
+	
 	@Transactional
 	public TransacaoDTO novaTransacao(TransacaoDTO dto) {
 		Usuario remetente = usuariosService.buscaUsuarioEntity(dto.remetente());
 		Usuario destinatario = usuariosService.buscaUsuarioEntity(dto.destinatario());
 		verificarTransferencia(remetente, destinatario, dto.valor());
-		verificarDisponibilidadeServico();
+		verificarAutorizacaoDeServico();
 		usuariosService.atualizarSaldoConta(remetente, destinatario, dto.valor());
 		Transacao transacao = new Transacao(remetente, destinatario, true, dto.valor());
 		repository.save(transacao);
-		return converter.paraTransacaoDTO(transacao);
+        TransacaoDTO transacaoDTO = converter.paraTransacaoDTO(transacao);
+
+        notificacaoService.notificarPagamentoRecebido(destinatario, dto.valor());
+
+        return transacaoDTO;
 	}
 
 
@@ -52,8 +66,18 @@ public class TransacaoService {
 			throw new SaldoInsuficienteException("O usuário remetente não possui saldo suficiente para realizar a transação.");
 	}
 	
-	//TODO: fazer a verificação da disponibilidade
-	private void verificarDisponibilidadeServico() {
-		
+	private void verificarAutorizacaoDeServico() {
+		try {
+	        AutorizacaoResponse response = autorizadorClient.autorizarTransferencia();
+	        if (!"success".equalsIgnoreCase(response.status())) {
+	            throw new TransferenciaNaoAutorizadaException("Transferência não autorizada pelo serviço externo.");
+	        }
+	    } catch (feign.FeignException e) {
+	        if (e.status() == HttpStatus.FORBIDDEN.value()) {
+	            throw new TransferenciaNaoAutorizadaException("Transferência não autorizada pelo serviço externo.");
+	        }
+	        throw e; 
+	    }
 	}
+	
 }
