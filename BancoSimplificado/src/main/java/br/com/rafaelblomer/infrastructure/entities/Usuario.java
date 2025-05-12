@@ -9,13 +9,13 @@ import jakarta.persistence.InheritanceType;
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
-public abstract class Usuario {
+public class Usuario {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	private String nomeCompleto;
-	private String cpf;
+	private String documento;
 	private String email;
 	private String senha;
 	private Double saldo;
@@ -23,12 +23,12 @@ public abstract class Usuario {
 	public Usuario() {
 	}
 
-	public Usuario(String nomeCompleto, String cpf, String email, String senha, Double saldo) {
+	public Usuario(String nomeCompleto, String documento, String email, String senha) {
 		this.nomeCompleto = nomeCompleto;
-		this.cpf = cpf;
+		this.documento = documento;
 		this.email = email;
 		this.senha = senha;
-		this.saldo = saldo;
+		this.saldo = 0D;
 	}
 
 	public String getNomeCompleto() {
@@ -39,12 +39,12 @@ public abstract class Usuario {
 		this.nomeCompleto = nomeCompleto;
 	}
 
-	public String getCpf() {
-		return cpf;
+	public String getDocumento() {
+		return documento;
 	}
 
-	public void setCpf(String cpf) {
-		this.cpf = cpf;
+	public void setDocumento(String documento) {
+		this.documento = documento;
 	}
 
 	public String getEmail() {
@@ -78,5 +78,5 @@ public abstract class Usuario {
 	public void setId(Long id) {
 		this.id = id;
 	}
-	
+
 }

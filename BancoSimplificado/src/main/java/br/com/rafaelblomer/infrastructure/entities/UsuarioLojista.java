@@ -8,8 +8,9 @@ public class UsuarioLojista extends Usuario {
 	public UsuarioLojista() {
 	}
 
-	public UsuarioLojista(String nomeCompleto, String cpf, String email, String senha, Double saldo) {
-		super(nomeCompleto, cpf, email, senha, saldo);
+	public UsuarioLojista(String nomeCompleto, String documento, String email, String senha) {
+		super(nomeCompleto, documento, email, senha);
 	}
+
 
 }

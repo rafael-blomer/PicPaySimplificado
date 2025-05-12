@@ -8,8 +8,8 @@ public class UsuarioComum extends Usuario {
 	public UsuarioComum() {
 	}
 
-	public UsuarioComum(String nomeCompleto, String cpf, String email, String senha, Double saldo) {
-		super(nomeCompleto, cpf, email, senha, saldo);
+	public UsuarioComum(String nomeCompleto, String documento, String email, String senha) {
+		super(nomeCompleto, documento, email, senha);
 	}
 
 }
